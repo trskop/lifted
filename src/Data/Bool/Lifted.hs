@@ -42,7 +42,7 @@ import Data.Bool
 import Data.Functor (Functor, fmap)
 
 
--- | Lifted '&&' 'Bool' operation over an 'Applicative'.
+-- | Lifted '||' 'Bool' operation over an 'Applicative'.
 (<||>) :: Applicative f => f Bool -> f Bool -> f Bool
 (<||>) = liftA2 (||)
 {-# INLINE (<||>) #-}

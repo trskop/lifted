@@ -92,7 +92,7 @@ notA = fmap not
 {-# INLINE notA #-}
 
 -- | Function 'bool' lifted over a 'Functor'.
-boolA :: Applicative f => a -> a -> f Bool -> f a
+boolA :: Functor f => a -> a -> f Bool -> f a
 boolA x y = fmap (bool x y)
 {-# INLINE boolA #-}
 

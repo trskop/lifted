@@ -28,9 +28,11 @@ library
   hs-source-dirs:       src
   exposed-modules:
       Data.Bool.Lifted
+    , Data.Either.Lifted
     , Data.Eq.Lifted
     , Data.Function.Lifted
     , Data.Functor.Lifted
+    , Data.Maybe.Lifted
   -- other-modules:
 
   default-language:     Haskell2010

@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:       $HEADER$
@@ -17,10 +18,17 @@ module Data.Maybe.Lifted
     , whenJust
     , whenNothing
     , onJust
+
+    , guardNothing
+    , guardJust
+    , guardJust_
     )
   where
 
-import Control.Applicative (Applicative, pure)
+import Control.Applicative (Alternative, Applicative, pure)
+import Control.Monad (guard)
+import Data.Bool (Bool(False))
+import Data.Function ((.))
 import Data.Maybe
 
 
@@ -38,3 +46,17 @@ whenNothing _       _ = pure ()
 onJust :: Applicative f => Maybe a -> (a -> f ()) -> f ()
 onJust Nothing  _ = pure ()
 onJust (Just a) f = f a
+
+-- | Short-hand for @'guard' . 'isNothing'@
+guardNothing :: Alternative f => Maybe a -> f ()
+guardNothing = guard . isNothing
+
+-- | Guard on a 'Just' vaule.
+guardJust :: Alternative f => (a -> Bool) -> Maybe a -> f ()
+guardJust p = guard . \case
+    Nothing -> False
+    Just a -> p a
+
+-- | Short-hand for @'guard' . 'isJust'@
+guardJust_ :: Alternative f => Maybe a -> f ()
+guardJust_ = guard . isJust

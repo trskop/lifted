@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:       $HEADER$
@@ -21,11 +22,18 @@ module Data.Either.Lifted
     , whenRight
     , onLeft
     , onRight
+
+    , guardLeft
+    , guardLeft_
+    , guardRight
+    , guardRight_
     )
   where
 
-import Control.Applicative (Applicative, pure)
-import Data.Function (id)
+import Control.Applicative (Alternative, Applicative, pure)
+import Control.Monad (guard)
+import Data.Bool (Bool(False))
+import Data.Function ((.), id)
 import Data.Either
 
 
@@ -56,3 +64,23 @@ onLeft _        _ = pure ()
 onRight :: Applicative f => Either a b -> (b -> f ()) -> f ()
 onRight (Right b) f = f b
 onRight _         _ = pure ()
+
+-- | Guard that checks the 'Left' value.
+guardLeft :: Alternative f => (a -> Bool) -> Either a b -> f ()
+guardLeft p = guard . \case
+    Left a -> p a
+    Right _ -> False
+
+-- | Guard that checks the 'Right' value.
+guardRight :: Alternative f => (b -> Bool) -> Either a b -> f ()
+guardRight p = guard . \case
+    Left _ -> False
+    Right b -> p b
+
+-- | Short-hand for @'guard' . 'isLeft'@
+guardLeft_ :: Alternative f => Either a b -> f ()
+guardLeft_ = guard . isLeft
+
+-- | Short-hand for @'guard' . 'isRight'@
+guardRight_ :: Alternative f => Either a b -> f ()
+guardRight_ = guard . isRight

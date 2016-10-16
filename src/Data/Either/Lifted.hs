@@ -14,10 +14,17 @@
 -- Extended module "Data.Either", from base, with additional functions.
 module Data.Either.Lifted
     ( module Data.Either
+
     , fromLeft
-    , fromLeftA
+    , fromLeft_
     , fromRight
+    , fromRight_
+
+    , fromLeftA
+    , fromLeftA_
     , fromRightA
+    , fromRightA_
+
     , whenLeft
     , whenRight
     , onLeft
@@ -33,7 +40,7 @@ module Data.Either.Lifted
 import Control.Applicative (Alternative, Applicative, pure)
 import Control.Monad (guard)
 import Data.Bool (Bool(False))
-import Data.Function ((.), id)
+import Data.Function ((.), const, id)
 import Data.Either
 
 
@@ -45,6 +52,14 @@ import Data.Either
 fromLeft :: (b -> a) -> Either a b -> a
 fromLeft = either id
 
+-- | Variant of 'fromLeft' that forgets the 'Right' value:
+--
+-- @
+-- 'fromLeft_' def = 'fromLeft' ('const' def)
+-- @
+fromLeft_ :: a -> Either a b -> a
+fromLeft_ = fromLeft . const
+
 -- | Variant of 'fromLeft' where result is lifted to 'Applicative'. Defined as:
 --
 -- @
@@ -53,6 +68,14 @@ fromLeft = either id
 fromLeftA :: Applicative f => (b -> f a) -> Either a b -> f a
 fromLeftA = either pure
 
+-- | Variant of 'fromLeftA' that forgets the left value. It's defined as:
+--
+-- @
+-- 'fromLeftA_' def = 'fromLeftA' ('const' def)
+-- @
+fromLeftA_ :: Applicative f => f a -> Either a b -> f a
+fromLeftA_ = fromLeftA . const
+
 -- | Specialised 'either':
 --
 -- @
@@ -60,6 +83,14 @@ fromLeftA = either pure
 -- @
 fromRight :: (a -> b) -> Either a b -> b
 fromRight f = either f id
+
+-- | Variant of 'fromRight' that forgets the 'Left' value:
+--
+-- @
+-- 'fromRight_' def = 'fromRight' ('const' def)
+-- @
+fromRight_ :: b -> Either a b -> b
+fromRight_ = fromRight . const
 
 -- | Variant of 'fromRight' where result is lifted to 'Applicative'. Defined
 -- as:

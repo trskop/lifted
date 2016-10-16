@@ -35,6 +35,8 @@ module Data.Eq.Lifted
 
 import Control.Applicative (Applicative, liftA2)
 import Data.Bool (Bool)
+import Data.Function ((.))
+import Data.Functor (fmap)
 import Data.Eq
 
 

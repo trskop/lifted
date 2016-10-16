@@ -21,6 +21,80 @@ These functions have proved useful to the author over the years. All of them
 have, at some point, being used in a production code.
 
 
+## Examples
+
+### Conversion of Error Handling
+
+Various forms of error handling are used in Haskell libraries, and
+applications. Some lifted functions allow us to convert between them with ease.
+While the syntactic overhead is bigger then using functions customized to such
+tasks; these functions are much more generic and so the code can be adjusted to
+different error handling strategies with minimal changes.
+
+Convert `Either a b` to `Maybe b` where `Left _` is interpreted as `Nothing`:
+
+```Haskell
+fromRightA_ Nothing :: Either a b -> Maybe b
+```
+
+Convert the same `Either a b` to `IO b` and throw exception when `Left` is encountered:
+
+```Haskell
+fromRightA_ (throwIO MissingValueException) :: Either a b -> IO b
+
+-- or when:
+--   MissingValueException :: String -> MissingValueException
+-- then:
+
+fromRightA (throwIO . MissingValueException) :: Either String b -> IO b
+```
+
+Convert `Maybe a` in to `Either String a` where the `String` argument contains
+error message in case when `Nothing` is encountered:
+
+```Haskell
+fromJustA (Left "Error message.") :: Maybe a -> Either String a
+```
+
+Throw an exception on `Nothing`:
+
+```Haskell
+fromJustA (throwIO MissingValueException) :: Maybe a -> IO a
+```
+
+### Predicates
+
+Simplified predicates:
+
+```Haskell
+import Data.Bool.Lifted ((<||>))
+import Data.Eq.Lifted (is)
+
+
+isSquareBracket :: Char -> Bool
+isSquareBracket = is '[' <||> is ']'    -- Same as: (== '[') <||> (== ']')
+```
+
+Effectful conditions:
+
+```Haskell
+import System.Directory (doesFileExist, executable, getPermissions)
+import Data.Bool.Lifted ((<&&>))
+
+
+execute :: FilePath -> IO ()
+execute fp = do
+    isExe <- doesFileExist fp <&&> isExecutable fp
+    if isExe
+        then do
+            -- -->8--
+        else do
+            -- -->8--
+  where
+    isExecutable = fmap executable . getPermissions
+```
+
+
 ## License
 
 The BSD 3-Clause License, see [LICENSE][] file for details.

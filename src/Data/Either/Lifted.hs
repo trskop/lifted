@@ -51,6 +51,7 @@ import Data.Either
 -- @
 fromLeft :: (b -> a) -> Either a b -> a
 fromLeft = either id
+{-# INLINE fromLeft #-}
 
 -- | Variant of 'fromLeft' that forgets the 'Right' value:
 --
@@ -59,6 +60,7 @@ fromLeft = either id
 -- @
 fromLeft_ :: a -> Either a b -> a
 fromLeft_ = fromLeft . const
+{-# INLINE fromLeft_ #-}
 
 -- | Variant of 'fromLeft' where result is lifted to 'Applicative'. Defined as:
 --
@@ -67,6 +69,7 @@ fromLeft_ = fromLeft . const
 -- @
 fromLeftA :: Applicative f => (b -> f a) -> Either a b -> f a
 fromLeftA = either pure
+{-# INLINE fromLeftA #-}
 
 -- | Variant of 'fromLeftA' that forgets the left value. It's defined as:
 --
@@ -75,6 +78,7 @@ fromLeftA = either pure
 -- @
 fromLeftA_ :: Applicative f => f a -> Either a b -> f a
 fromLeftA_ = fromLeftA . const
+{-# INLINE fromLeftA_ #-}
 
 -- | Specialised 'either':
 --
@@ -83,6 +87,7 @@ fromLeftA_ = fromLeftA . const
 -- @
 fromRight :: (a -> b) -> Either a b -> b
 fromRight f = either f id
+{-# INLINE fromRight #-}
 
 -- | Variant of 'fromRight' that forgets the 'Left' value:
 --
@@ -91,6 +96,7 @@ fromRight f = either f id
 -- @
 fromRight_ :: b -> Either a b -> b
 fromRight_ = fromRight . const
+{-# INLINE fromRight_ #-}
 
 -- | Variant of 'fromRight' where result is lifted to 'Applicative'. Defined
 -- as:
@@ -121,6 +127,7 @@ fromRight_ = fromRight . const
 -- @
 fromRightA :: Applicative f => (a -> f b) -> Either a b -> f b
 fromRightA f = either f pure
+{-# INLINE fromRightA #-}
 
 -- | Variant of 'fromRightA' that forgets the 'Left' value. It's defined as:
 --
@@ -141,6 +148,7 @@ fromRightA f = either f pure
 -- @
 fromRightA_ :: Applicative f => f b -> Either a b -> f b
 fromRightA_ = fromRightA . const
+{-# INLINE fromRightA_ #-}
 
 -- | Short-hand for @\\x -> 'Control.Monad.when' ('isLeft' x)@.
 whenLeft :: Applicative f => Either a b -> f () -> f ()

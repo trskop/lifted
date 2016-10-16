@@ -50,12 +50,12 @@ fromRightA :: Applicative f => (a -> f b) -> Either a b -> f b
 fromRightA f = either f pure
 
 whenLeft :: Applicative f => Either a b -> f () -> f ()
-whenLeft (Left _) _ = pure ()
-whenLeft _        x = x
+whenLeft (Left _) x = x
+whenLeft _        _ = pure ()
 
 whenRight :: Applicative f => Either a b -> f () -> f ()
-whenRight (Left _) x = x
-whenRight _        _ = pure ()
+whenRight (Left _) _ = pure ()
+whenRight _        x = x
 
 onLeft :: Applicative f => Either a b -> (a -> f ()) -> f ()
 onLeft (Left a) f = f a

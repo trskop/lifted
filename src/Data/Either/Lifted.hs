@@ -37,30 +37,113 @@ import Data.Function ((.), id)
 import Data.Either
 
 
+-- | Specialised 'either':
+--
+-- @
+-- 'fromLeft' = 'either' 'id'
+-- @
 fromLeft :: (b -> a) -> Either a b -> a
 fromLeft = either id
 
+-- | Variant of 'fromLeft' where result is lifted to 'Applicative'. Defined as:
+--
+-- @
+-- 'fromLeftA' = 'either' 'pure'
+-- @
 fromLeftA :: Applicative f => (b -> f a) -> Either a b -> f a
 fromLeftA = either pure
 
+-- | Specialised 'either':
+--
+-- @
+-- 'fromRight' f = 'either' f 'id'
+-- @
 fromRight :: (a -> b) -> Either a b -> b
 fromRight f = either f id
 
+-- | Variant of 'fromRight' where result is lifted to 'Applicative'. Defined
+-- as:
+--
+-- @
+-- 'fromRightA' f = 'either' f 'pure'
+-- @
+--
+-- === __Examples__
+--
+-- @
+-- import Control.Monad.Except (MonadError, throwError)
+--     -- From <https://hackage.haskell.org/package/mtl mtl> package.
+--
+-- example :: MonadError e m => 'Either' e a -> m a
+-- example = 'fromRightA' throwError
+-- @
+--
+-- @
+-- import "Control.Exception" ('Control.Exception.throwIO')
+--
+-- example
+--     :: 'Control.Exception.Exception' e
+--     => (a -> e)
+--     -> 'Either' a b
+--     -> 'System.IO.IO' b
+-- example f = 'fromRightA' ('Control.Exception.throwIO' . f)
+-- @
 fromRightA :: Applicative f => (a -> f b) -> Either a b -> f b
 fromRightA f = either f pure
 
+-- | Variant of 'fromRightA' that forgets the 'Left' value. It's defined as:
+--
+-- @
+-- 'fromRightA_' def = 'fromRightA' ('const' def)
+-- @
+--
+-- === __Examples__
+--
+-- @
+-- 'fromRightA_' 'Data.Maybe.Nothing'
+--     :: 'Either' a b -> 'Data.Maybe.Maybe' b
+-- @
+--
+-- @
+-- 'fromRightA_' ('Control.Exception.throwIO' MissingSomeMandatoryValue)
+--     :: 'Either' a b -> 'System.IO.IO' b
+-- @
+fromRightA_ :: Applicative f => f b -> Either a b -> f b
+fromRightA_ = fromRightA . const
+
+-- | Short-hand for @\\x -> 'Control.Monad.when' ('isLeft' x)@.
 whenLeft :: Applicative f => Either a b -> f () -> f ()
 whenLeft (Left _) x = x
 whenLeft _        _ = pure ()
 
+-- | Short-hand for @\\x -> 'Control.Monad.when' ('isRight' x)@.
 whenRight :: Applicative f => Either a b -> f () -> f ()
 whenRight (Left _) _ = pure ()
 whenRight _        x = x
 
+-- | Perform action with 'Left' value.
+--
+-- === __Example__
+--
+-- @
+-- example = do
+--     r <- someActionReturningEither
+--     'onLeft' r $ \\e -> 'Control.Monad.when' (isError e)
+--         $ 'Control.Exception.throwIO' (errorToException e)
+--     -- -->8--
+-- @
+--
+-- @
+-- example = do
+--     r <- someActionReturningEither
+--     'onLeft' r logMessage
+--     -- -->8--
+-- @
 onLeft :: Applicative f => Either a b -> (a -> f ()) -> f ()
 onLeft (Left a) f = f a
 onLeft _        _ = pure ()
 
+-- | Perform action with 'Right' value.
 onRight :: Applicative f => Either a b -> (b -> f ()) -> f ()
 onRight (Right b) f = f b
 onRight _         _ = pure ()

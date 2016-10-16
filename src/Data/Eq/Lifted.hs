@@ -26,6 +26,10 @@ module Data.Eq.Lifted
     -- * Prefix Aliases For Eq Operations
     , is
     , isNot
+
+    -- * Partially Lifted Eq Operations
+    , isA
+    , isNotA
     )
   where
 
@@ -53,3 +57,13 @@ is = (==)
 isNot :: Eq a => a -> a -> Bool
 isNot = (/=)
 {-# INLINE isNot #-}
+
+-- | Partially lifted '==' 'Eq' operation over 'Applicative'.
+isA :: (Applicative f, Eq a) => a -> f a -> f Bool
+isA = fmap . (==)
+{-# INLINE isA #-}
+
+-- | Partially lifted '/=' 'Eq' operation over 'Applicative'.
+isNotA :: (Applicative f, Eq a) => a -> f a -> f Bool
+isNotA = fmap . (/=)
+{-# INLINE isNotA #-}

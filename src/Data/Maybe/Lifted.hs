@@ -37,17 +37,39 @@ import Data.Maybe
 maybeA :: Applicative f => b -> (a -> f b) -> f b
 maybeA b = maybe (pure b)
 
+-- | @'fromJustA' d = 'maybe' d 'pure'@
 fromJustA :: Applicative f => f a -> Maybe a -> f a
 fromJustA d = maybe d pure
 
+-- | @'whenJust' x action = 'maybe' ('pure' ()) action x@
 whenJust :: Applicative f => Maybe a -> f () -> f ()
 whenJust Nothing _ = pure ()
 whenJust _       x = x
 
+-- | @'whenNothing' x action = 'maybe' action (\\_ -> 'pure' ()) x@
 whenNothing :: Applicative f => Maybe a -> f () -> f ()
 whenNothing Nothing x = x
 whenNothing _       _ = pure ()
 
+-- | Run action on a 'Just' value.
+--
+-- Here are few examples of functions to which 'onJust' is equivalent:
+--
+-- @
+-- 'onJust' x f = 'maybe' ('pure' ()) f x
+-- 'onJust' x f = 'maybeA' () f x
+-- @
+--
+-- Usage example:
+--
+-- @
+-- \\possiblyHandle -> do
+--     onJust possiblyHandle $ setCorrectBuffering
+--     let handle = 'fromMaybe' stdout possiblyHandle
+--     -- -->8--
+--   where
+--     setCorrectBuffering = -- -->8--
+-- @
 onJust :: Applicative f => Maybe a -> (a -> f ()) -> f ()
 onJust Nothing  _ = pure ()
 onJust (Just a) f = f a

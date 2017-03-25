@@ -4,7 +4,7 @@
 -- Module:       $HEADER$
 -- Description:  Extended module Data.Maybe, from base, with additional
 --               functions.
--- Copyright:    (c) 2016 Peter Trško
+-- Copyright:    (c) 2016-2017 Peter Trško
 -- License:      BSD3
 --
 -- Maintainer:   peter.trsko@gmail.com
@@ -14,6 +14,7 @@
 -- Extended module "Data.Maybe", from base, with additional functions.
 module Data.Maybe.Lifted
     ( module Data.Maybe
+    , maybeA
     , fromJustA
     , whenJust
     , whenNothing
@@ -31,6 +32,10 @@ import Data.Bool (Bool(False))
 import Data.Function ((.))
 import Data.Maybe
 
+
+-- | @'maybeA' b f = 'maybe' ('pure' b) f@
+maybeA :: Applicative f => b -> (a -> f b) -> f b
+maybeA b = maybe (pure b)
 
 fromJustA :: Applicative f => f a -> Maybe a -> f a
 fromJustA d = maybe d pure

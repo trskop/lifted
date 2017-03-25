@@ -34,7 +34,7 @@ import Data.Maybe
 
 
 -- | @'maybeA' b f = 'maybe' ('pure' b) f@
-maybeA :: Applicative f => b -> (a -> f b) -> f b
+maybeA :: Applicative f => b -> (a -> f b) -> Maybe a -> f b
 maybeA b = maybe (pure b)
 
 -- | @'fromJustA' d = 'maybe' d 'pure'@
